@@ -1,7 +1,5 @@
 const UserModel = require('../models/user-model');
 const bcrypt = require('bcrypt');
-const uuid = require('uuid');
-const mailService = require('./mail-service');
 const tokenService = require('./token-service');
 const UserDto = require('../dtos/user-dto');
 const ApiError = require('../exceptions/api-error');
@@ -13,12 +11,7 @@ class UserService {
       throw ApiError.BadRequest(`User with email ${email} already exists`);
     }
     const hashPassword = await bcrypt.hash(password, 3);
-    const activationLink = uuid.v4();
-    const newUser = await UserModel.create({ email, password: hashPassword, activationLink });
-    await mailService.sendActivationMail(
-      email,
-      `${process.env.API_URL}api/activate/${activationLink}`,
-    );
+    const newUser = await UserModel.create({ email, password: hashPassword });
     const userDto = new UserDto(newUser);
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
