@@ -80,6 +80,14 @@ class UserController {
       next(e);
     }
   }
+  async getUserById(req, res, next) {
+    try {
+      const userData = await userService.getUserById(req.params.id);
+      return res.json(userData);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = new UserController();

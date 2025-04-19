@@ -79,6 +79,11 @@ class UserService {
     const users = usersData?.map((user) => new UserDto(user));
     return users;
   }
+
+  async getUserById(userId) {
+    const userData = await UserModel.findById(userId);
+    return new UserDto(userData);
+  }
 }
 
 module.exports = new UserService();
