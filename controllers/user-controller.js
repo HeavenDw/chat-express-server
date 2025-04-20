@@ -79,6 +79,14 @@ class UserController {
       next(e);
     }
   }
+  async getOnlineUsers(req, res, next) {
+    try {
+      const users = await userService.getOnlineUsers();
+      return res.json(users);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = new UserController();

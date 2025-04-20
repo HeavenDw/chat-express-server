@@ -2,7 +2,9 @@ const UserModel = require('../models/user-model');
 const bcrypt = require('bcrypt');
 const tokenService = require('./token-service');
 const UserDto = require('../dtos/user-dto');
+const UserOnlineDto = require('../dtos/user-online-dto');
 const ApiError = require('../exceptions/api-error');
+const UserOnlineModel = require('../models/user-online-model');
 
 class UserService {
   async registration(email, password) {
@@ -76,6 +78,12 @@ class UserService {
   async getUserById(userId) {
     const userData = await UserModel.findById(userId);
     return new UserDto(userData);
+  }
+
+  async getOnlineUsers() {
+    const onlineUsers = await UserOnlineModel.find();
+    const users = onlineUsers?.map((user) => new UserOnlineDto(user));
+    return users;
   }
 }
 

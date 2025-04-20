@@ -8,6 +8,7 @@ const errorMiddleware = require('./middlewares/error-middleware');
 const PORT = process.env.PORT || 5000;
 const app = express();
 const MessageModel = require('./models/message-model');
+const UserOnlineModel = require('./models/user-online-model');
 const WSServer = require('express-ws')(app);
 const aWss = WSServer.getWss();
 
@@ -23,18 +24,28 @@ app.use('/api', router);
 app.use(errorMiddleware);
 
 app.ws('/', (ws) => {
-  ws.on('message', (message) => {
+  ws.on('message', async (message) => {
     const parsedMessage = JSON.parse(message);
     switch (parsedMessage.event) {
-      case 'connect':
-      case 'disconnect':
-        broadcastMessage(parsedMessage);
+      case 'connect': {
+        const userOnline = await UserOnlineModel.findOne({ email: parsedMessage.user.email });
+        if (!userOnline) {
+          UserOnlineModel.create(parsedMessage.user);
+        }
         break;
-      case 'message':
-        broadcastMessage(parsedMessage);
+      }
+      case 'disconnect': {
+        await UserOnlineModel.findOneAndDelete({
+          email: parsedMessage.user.email,
+        });
+        break;
+      }
+      case 'message': {
         MessageModel.create(parsedMessage);
         break;
+      }
     }
+    broadcastMessage(parsedMessage);
   });
 });
 
