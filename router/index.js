@@ -14,6 +14,13 @@ router.post(
 router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.get('/refresh', userController.refresh);
+router.patch(
+  '/users/:id',
+  authMiddleware,
+  body('email').isEmail(),
+  body('password').isLength({ min: 6, max: 32 }),
+  userController.editUser,
+);
 router.get('/users/online', authMiddleware, userController.getOnlineUsers);
 router.get('/users/:id', authMiddleware, userController.getUserById);
 router.get('/users', authMiddleware, userController.getUsers);

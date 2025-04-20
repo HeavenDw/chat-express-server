@@ -87,6 +87,14 @@ class UserController {
       next(e);
     }
   }
+  async editUser(req, res, next) {
+    try {
+      const user = await userService.editUser(req.params.id, req.body);
+      return res.json(user);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = new UserController();

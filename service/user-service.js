@@ -85,6 +85,13 @@ class UserService {
     const users = onlineUsers?.map((user) => new UserOnlineDto(user));
     return users;
   }
+
+  async editUser(id, user) {
+    const hashPassword = user?.password && (await bcrypt.hash(user.password, 3));
+    const updatedUser = { ...user, password: hashPassword };
+    const userData = await UserModel.findByIdAndUpdate(id, updatedUser, { new: true });
+    return new UserDto(userData);
+  }
 }
 
 module.exports = new UserService();
