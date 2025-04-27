@@ -6,6 +6,7 @@ const messageSchema = new mongoose.Schema({
   user: {
     id: { type: String, required: true },
     email: { type: String, required: true },
+    name: { type: String, required: true },
   },
   body: {
     type: String,

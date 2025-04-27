@@ -7,13 +7,17 @@ const ApiError = require('../exceptions/api-error');
 const UserOnlineModel = require('../models/user-online-model');
 
 class UserService {
-  async registration(email, password) {
-    const user = await UserModel.findOne({ email });
-    if (user) {
+  async registration(name, email, password) {
+    const userByName = await UserModel.findOne({ name });
+    if (userByName) {
+      throw ApiError.BadRequest(`User with name ${name} already exists`);
+    }
+    const userByEmail = await UserModel.findOne({ email });
+    if (userByEmail) {
       throw ApiError.BadRequest(`User with email ${email} already exists`);
     }
     const hashPassword = await bcrypt.hash(password, 3);
-    const newUser = await UserModel.create({ email, password: hashPassword });
+    const newUser = await UserModel.create({ name, email, password: hashPassword });
     const userDto = new UserDto(newUser);
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
@@ -30,10 +34,10 @@ class UserService {
     await user.save();
   }
 
-  async login(email, password) {
-    const user = await UserModel.findOne({ email });
+  async login(name, password) {
+    const user = await UserModel.findOne({ name });
     if (!user) {
-      throw ApiError.BadRequest(`User with email ${email} not found`);
+      throw ApiError.BadRequest(`User with name ${name} not found`);
     }
     const isPassEqueals = await bcrypt.compare(password, user.password);
     if (!isPassEqueals) {

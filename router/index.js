@@ -7,8 +7,9 @@ const messageController = require('../controllers/message-controller');
 
 router.post(
   '/registration',
+  body('name').isLength({ min: 5, max: 32 }),
   body('email').isEmail(),
-  body('password').isLength({ min: 6, max: 32 }),
+  body('password').isLength({ min: 5, max: 32 }),
   userController.registration,
 );
 router.post('/login', userController.login);
@@ -17,6 +18,7 @@ router.get('/refresh', userController.refresh);
 router.patch(
   '/users/:id',
   authMiddleware,
+  body('name').isLength({ min: 5, max: 32 }),
   body('email').isEmail(),
   body('password').isLength({ min: 6, max: 32 }),
   userController.editUser,
